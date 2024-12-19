@@ -63,32 +63,53 @@ const renderSearchTable = (article) => {
 
 // Enviar formulario para crear o actualizar un artículo
 document.getElementById('articleForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const sku = document.getElementById('sku').value;
-  const nombre = document.getElementById('nombre').value;
-  const marca = document.getElementById('marca').value;
-  const cantidad = document.getElementById('cantidad').value;
-
-  const method = editingSku ? 'PUT' : 'POST';
-  const url = editingSku ? `${apiUrl}/${editingSku}` : apiUrl;
-
-  await fetch(url, {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sku, nombre, marca, cantidad })
+    e.preventDefault();
+    const sku = document.getElementById('sku').value;
+    const nombre = document.getElementById('nombre').value;
+    const marca = document.getElementById('marca').value;
+    const cantidad = document.getElementById('cantidad').value;
+  
+    const method = editingSku ? 'PUT' : 'POST';
+    const url = editingSku ? `${apiUrl}/${editingSku}` : apiUrl;
+  
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sku: editingSku,
+          nombre,
+          marca,
+          cantidad,
+          nuevoSku: sku // Enviar el nuevo SKU si se modificó
+        })
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (errorData.error === 'El nuevo SKU ya existe') {
+          alert('Error: El nuevo SKU ya existe. Intenta con otro.');
+          return;
+        } else {
+          throw new Error('Error al guardar el artículo');
+        }
+      }
+  
+      editingSku = null;
+      document.getElementById('articleForm').reset();
+      loadArticles();
+  
+      // Si se estaba mostrando un artículo en la búsqueda, actualiza la tabla de búsqueda
+      if (searchArticleData) {
+        const response = await fetch(`${apiUrl}/${searchArticleData.sku}`);
+        const updatedArticle = await response.json();
+        renderSearchTable(updatedArticle || null);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Ocurrió un error al guardar el artículo.');
+    }
   });
-
-  editingSku = null;
-  document.getElementById('articleForm').reset();
-  loadArticles();
-
-  // Si se estaba mostrando un artículo en la búsqueda, actualiza la tabla de búsqueda
-  if (searchArticleData) {
-    const response = await fetch(`${apiUrl}/${searchArticleData.sku}`);
-    const updatedArticle = await response.json();
-    renderSearchTable(updatedArticle || null);
-  }
-});
 
 // Eliminar un artículo
 const deleteArticle = async (sku, fromSearch) => {
