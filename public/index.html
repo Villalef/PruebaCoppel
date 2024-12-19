@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Artículos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <h1>Gestión de Artículos</h1>
+
+  <div class="container">
+    <!-- Formulario de creación y actualización de artículos -->
+    <form id="articleForm">
+      <input type="text" id="sku" placeholder="SKU" maxlength="6" required>
+      <input type="text" id="nombre" placeholder="Nombre" maxlength="50" required>
+      <input type="text" id="marca" placeholder="Marca" maxlength="30" required>
+      <input type="number" id="cantidad" placeholder="Cantidad" required>
+      <button type="submit">Guardar</button>
+    </form>
+
+    <!-- Campo de búsqueda -->
+    <div class="search-container">
+      <input type="text" id="searchSku" placeholder="Buscar por SKU">
+      <button onclick="searchArticle()">Buscar</button>
+    </div>
+
+    <!-- Tabla de todos los artículos -->
+    <table>
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Nombre</th>
+          <th>Marca</th>
+          <th>Cantidad</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="articleTable"></tbody>
+    </table>
+
+    <!-- Contenedor para la tabla de búsqueda -->
+    <div id="searchTable" class="search-results"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
