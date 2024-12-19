@@ -29,10 +29,21 @@ app.get('/api/articulos', (req, res) => {
 // Ruta para crear un artículo
 app.post('/api/articulos', (req, res) => {
   const { sku, nombre, marca, cantidad } = req.body;
-  const sql = `INSERT INTO articulos (sku, nombre, marca, cantidad) VALUES (?, ?, ?, ?)`;
-  db.query(sql, [sku, nombre, marca, cantidad], (err, result) => {
+
+  // Verificar si el SKU ya existe
+  db.query('SELECT * FROM articulos WHERE sku = ?', [sku], (err, results) => {
     if (err) return res.status(500).send(err.message);
-    res.status(201).send('Artículo creado');
+
+    if (results.length > 0) {
+      return res.status(400).json({ error: 'El SKU ya existe' });
+    }
+
+    // Insertar el artículo si el SKU no existe
+    const sql = `INSERT INTO articulos (sku, nombre, marca, cantidad) VALUES (?, ?, ?, ?)`;
+    db.query(sql, [sku, nombre, marca, cantidad], (err, result) => {
+      if (err) return res.status(500).send(err.message);
+      res.status(201).send('Artículo creado');
+    });
   });
 });
 
@@ -47,17 +58,39 @@ app.get('/api/articulos/:sku', (req, res) => {
 
 // Ruta para actualizar un artículo
 app.put('/api/articulos/:sku', (req, res) => {
-  const { sku } = req.params;
-  const { nombre, marca, cantidad } = req.body;
-  db.query(
-    'UPDATE articulos SET nombre = ?, marca = ?, cantidad = ? WHERE sku = ?',
-    [nombre, marca, cantidad, sku],
-    (err, result) => {
+  const { sku } = req.params; // SKU actual
+  const { nombre, marca, cantidad, nuevoSku } = req.body; // Datos del formulario
+
+  // Verificar si el nuevo SKU ya existe (si es diferente al actual)
+  if (nuevoSku && nuevoSku !== sku) {
+    db.query('SELECT * FROM articulos WHERE sku = ?', [nuevoSku], (err, results) => {
       if (err) return res.status(500).send(err.message);
-      res.send('Artículo actualizado');
-    }
-  );
+
+      if (results.length > 0) {
+        return res.status(400).json({ error: 'El nuevo SKU ya existe' });
+      }
+
+      // Actualizar el SKU y otros datos
+      actualizarArticulo(sku, nombre, marca, cantidad, nuevoSku, res);
+    });
+  } else {
+    // Solo actualizar los demás datos (sin cambiar el SKU)
+    actualizarArticulo(sku, nombre, marca, cantidad, sku, res);
+  }
 });
+
+// Función auxiliar para actualizar un artículo
+function actualizarArticulo(skuActual, nombre, marca, cantidad, nuevoSku, res) {
+  const sql = `
+    UPDATE articulos 
+    SET sku = ?, nombre = ?, marca = ?, cantidad = ? 
+    WHERE sku = ?
+  `;
+  db.query(sql, [nuevoSku, nombre, marca, cantidad, skuActual], (err, result) => {
+    if (err) return res.status(500).send(err.message);
+    res.send('Artículo actualizado');
+  });
+}
 
 // Ruta para eliminar un artículo
 app.delete('/api/articulos/:sku', (req, res) => {
