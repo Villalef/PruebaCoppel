@@ -46,9 +46,10 @@ ___
 
 **Configuración del Proyecto**
 
-1. Descarga el Proyecto en .zip
+1. Descarga el Proyecto
+2. Descomprimir la carpeta "node_modules"
 
-2. Configurar la Base de Datos
+3. Configurar la Base de Datos
 
 * Accede a phpMyAdmin y crea una base de datos llamada articulos_db.
 
