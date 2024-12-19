@@ -87,6 +87,11 @@ ___
  	node server.js
 
   * El servidor estará disponible en http://localhost:3000/
+
+**Entra a la aplicación desde tu navegador**
+
+	http://localhost:3000/index.html
+
  
 ___
 **Estructura del Proyecto**
