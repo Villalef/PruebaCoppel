@@ -46,12 +46,7 @@ ___
 
 **Configuración del Proyecto**
 
-1. Clonar el Repositorio
-
-* Clona este repositorio desde GitHub:
-
-git clone <URL_DEL_REPOSITORIO>
-cd PruebaT-cnica
+1. Descarga el Proyecto en .zip
 
 2. Configurar la Base de Datos
 
